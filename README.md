@@ -2,7 +2,7 @@
 
 App de punto de partida en Kotlin + Jetpack Compose con:
 
-- **Login simulado:** cualquier dato entra a la app.
+- **Login real contra la API** ([api-usuarios-2026](https://api-usuarios-2026.onrender.com/)): `POST /login` regresa un token JWT y con él se pide `GET /perfil`.
 - **Barra inferior (bottom navigation)** con 5 pantallas: Inicio, Buscar, Avisos, Favoritos y Perfil.
 - **Menú lateral (navigation drawer)** con 5 pantallas: Calendario, Mensajes, Reportes, Configuración y Acerca de, más **Cerrar sesión**.
 - **Barra superior** con el título de la pantalla actual y el botón ☰ para abrir el menú.
@@ -26,7 +26,18 @@ App de punto de partida en Kotlin + Jetpack Compose con:
 
 Todas están en `gradle/libs.versions.toml`: Kotlin 2.4.10, Navigation 2.9.8, Compose BOM, compileSdk/targetSdk 36 y minSdk 26. El permiso de Internet ya viene en el `AndroidManifest.xml`.
 
-## 4. Estructura
+## 4. Login con la API
+
+- La URL de la API está en `data/remote/RetrofitClient.kt` (`BASE_URL`).
+- Usuario de prueba: el admin que crea el seed de la API (por defecto `admin@mail.com` / `1234`).
+- Flujo: `LoginScreen` → `SesionViewModel.iniciarSesion()` → `AuthRepository` → `POST /login` (token) → `GET /perfil` con `Authorization: Bearer <token>`. Si todo sale bien, la app entra y **Perfil** muestra el correo y el rol.
+- Errores: 401 muestra "Correo o contraseña incorrectos"; sin red, "No se pudo conectar con el servidor".
+- El token vive **en memoria** dentro de `SesionViewModel`: al cerrar la app hay que iniciar sesión otra vez. Más adelante se guardará con DataStore.
+- **Cerrar sesión** (menú lateral) borra el token y regresa al login.
+- El plan gratuito de Render se duerme: el primer login del día puede tardar cerca de un minuto (los timeouts ya están en 60 s).
+- Para ver las peticiones en Logcat, filtra con `tag~:okhttp`.
+
+## 5. Estructura
 
 ```
 mx.tec.appbase
@@ -35,6 +46,13 @@ mx.tec.appbase
 │   ├── Rutas.kt                 Rutas y pantallas (con título e ícono) + listas de menús
 │   ├── AppNavigation.kt         Nivel 1: Login ↔ Principal
 │   └── PrincipalNavHost.kt      Nivel 2: las 10 pantallas internas
+├── data
+│   ├── remote
+│   │   ├── ApiService.kt        Rutas de la API (login, perfil)
+│   │   ├── Modelos.kt           LoginRequest, LoginResponse, Usuario
+│   │   └── RetrofitClient.kt    URL base, JSON y Logcat
+│   └── repository
+│       └── AuthRepository.kt    iniciarSesion() y obtenerPerfil()
 └── ui
     ├── components
     │   ├── BarraSuperior.kt     TopAppBar con botón ☰
@@ -42,14 +60,16 @@ mx.tec.appbase
     │   ├── MenuLateral.kt       Navigation drawer
     │   └── PantallaEjemplo.kt   Contenido de relleno de cada pantalla
     ├── screens
-    │   ├── LoginScreen.kt
+    │   ├── LoginScreen.kt       Llama al SesionViewModel y muestra errores
     │   ├── PrincipalScreen.kt   El cascarón: drawer + barras + NavHost
     │   ├── inferior/            Inicio, Buscar, Notificaciones, Favoritos, Perfil
     │   └── lateral/             Calendario, Mensajes, Reportes, Configuracion, AcercaDe
+    ├── viewmodel
+    │   └── SesionViewModel.kt   Token y usuario en memoria, compartido por toda la app
     └── theme                    Colores, tema y tipografía
 ```
 
-## 5. Cómo agregar y cambiar pantallas a tu proyecto
+## 6. Cómo agregar y cambiar pantallas a tu proyecto
 
 **Cambiar una pantalla:** abre su archivo (por ejemplo `inferior/InicioScreen.kt`), borra la llamada a `PantallaEjemplo` y escribe tu contenido.
 

@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import mx.tec.appbase.data.remote.Usuario
 import mx.tec.appbase.ui.screens.inferior.BuscarScreen
 import mx.tec.appbase.ui.screens.inferior.FavoritosScreen
 import mx.tec.appbase.ui.screens.inferior.InicioScreen
@@ -21,6 +22,7 @@ import mx.tec.appbase.ui.screens.lateral.ReportesScreen
 @Composable
 fun PrincipalNavHost(
     navController: NavHostController,
+    usuario: Usuario?,
     modifier: Modifier = Modifier,
 ) {
     NavHost(
@@ -33,7 +35,7 @@ fun PrincipalNavHost(
         composable(Pantalla.Buscar.route) { BuscarScreen() }
         composable(Pantalla.Notificaciones.route) { NotificacionesScreen() }
         composable(Pantalla.Favoritos.route) { FavoritosScreen() }
-        composable(Pantalla.Perfil.route) { PerfilScreen() }
+        composable(Pantalla.Perfil.route) { PerfilScreen(usuario = usuario) }
 
         // Menú lateral
         composable(Pantalla.Calendario.route) { CalendarioScreen() }
