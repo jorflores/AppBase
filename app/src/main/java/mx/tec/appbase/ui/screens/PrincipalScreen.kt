@@ -7,6 +7,7 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -19,11 +20,18 @@ import mx.tec.appbase.navigation.todasLasPantallas
 import mx.tec.appbase.ui.components.BarraInferior
 import mx.tec.appbase.ui.components.BarraSuperior
 import mx.tec.appbase.ui.components.MenuLateral
+import mx.tec.appbase.ui.viewmodel.SesionViewModel
 
 // El "cascarón" de la app: menú lateral + barra superior + barra inferior,
 // y en medio el NavHost con las pantallas.
 @Composable
-fun PrincipalScreen(onCerrarSesion: () -> Unit) {
+fun PrincipalScreen(
+    sesionViewModel: SesionViewModel,
+    onCerrarSesion: () -> Unit,
+) {
+    // Datos de la sesión (token y usuario) que dejó el login.
+    val sesion by sesionViewModel.estado.collectAsState()
+
     // NavController propio de la parte principal (distinto al de AppNavigation).
     val navController = rememberNavController()
 
@@ -88,6 +96,7 @@ fun PrincipalScreen(onCerrarSesion: () -> Unit) {
         ) { innerPadding ->
             PrincipalNavHost(
                 navController = navController,
+                usuario = sesion.usuario,
                 modifier = Modifier.padding(innerPadding),
             )
         }
