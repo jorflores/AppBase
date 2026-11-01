@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mx.tec.appbase.data.remote.Usuario
 
-// Muestra el usuario que regresó GET /perfil al iniciar sesión.
+// Muestra el usuario que regresó GET /perfil (al iniciar sesión o al abrir la app con un token guardado).
 @Composable
 fun PerfilScreen(usuario: Usuario?) {
     Column(
@@ -38,7 +38,8 @@ fun PerfilScreen(usuario: Usuario?) {
         Spacer(Modifier.height(16.dp))
 
         if (usuario == null) {
-            Text("No hay sesión iniciada", style = MaterialTheme.typography.bodyLarge)
+            // Al abrir la app con un token guardado, el perfil se pide a la API en segundo plano.
+            Text("Cargando perfil…", style = MaterialTheme.typography.bodyLarge)
         } else {
             Text(usuario.correo, style = MaterialTheme.typography.headlineSmall)
             Spacer(Modifier.height(8.dp))

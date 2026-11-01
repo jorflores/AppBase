@@ -71,6 +71,9 @@ dependencies {
     // Muestra en Logcat cada petición y respuesta (filtro: okhttp)
     implementation(libs.okhttp.logging.interceptor)
 
+    // DataStore: guarda el token en el teléfono para no pedir login cada vez
+    implementation(libs.androidx.datastore.preferences)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
